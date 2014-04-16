@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:widget="http://www.netvibes.com/ns/">
+    <head>
+
+        <!-- Application Metas -->
+        <title>Simple Clock</title>
+        <meta name="author" content="Yehuda Deutsch"/>
+        <meta name="description" content="A simple digital clock to use in Netvibes"/>
+        <meta name="copyright" content="2014, Yehuda Deutsch <yeh@uda.co.il>"/>
+        <meta name="license" content="http://opensource.org/licenses/mit-license.php"/>
+
+        <!-- Application Standalone emulation files -->
+        <link rel="stylesheet" type="text/css" href="http://uwa.netvibes.com/lib/c/UWA/assets/css/standalone.css"/>
+        <script type="text/javascript" src="http://uwa.netvibes.com/lib/c/UWA/js/UWA_Standalone_Alone.js"></script>
+
+        <!-- Application Preferences -->
+        <widget:preferences>
+            <widget:preference name="hoursFormat" type="list" label="Hours format" defaultValue="24">
+                <widget:option label="12" value="12"></widget:option>
+                <widget:option label="24" value="24"></widget:option>
+            </widget:preference>
+            <widget:preference name="showDate" type="boolean" label="Show date" defaultValue="false"></widget:preference>
+        </widget:preferences>
+
+        <!-- Application CSS Source -->
+        <style type="text/css">
+            #app-wrapper, #app-wrapper * {
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+            #app-wrapper {
+                width: 100%;
+                text-align: center;
+                font-family: sans-serif;
+            }
+            #clock {
+                font-size: 400%;
+                font-weight: bold;
+                padding: 10px;
+            }
+            #date {
+                padding-top: 10px;
+                font-size: 200%;
+            }
+            .digits {
+                padding: 0px 3px;
+            }
+            #ampm {
+                font-size: 50%;
+            }
+        </style>
+
+        <!-- Application JavaScript Source -->
+        <script type="text/javascript">
+            //<![CDATA[
+
+            var MyWidget = {
+
+                time: null,
+                updateInterval: null,
+                hoursFormat: 24,
+                showDate: false,
+                widget: widget,
+
+                timeFormat: function () {
+                    this.time = new Date();
+                    this.hoursFormat = widget.getValue('hoursFormat');
+                    hours = '%' + (this.hoursFormat == 12 ? 'I' : 'H');
+                    minutes = '%M';
+                    seconds = '%S';
+                    formatted = '<div id="clock">';
+                    formatted += '<span id="hours" class="digits">' + hours + '</span>:';
+                    formatted += '<span id="minutes" class="digits">' + minutes + '</span>:';
+                    formatted += '<span id="seconds" class="digits">' + seconds + '</span>';
+                    if (this.hoursFormat == 12) formatted += ' <span id="ampm">%P</span>';
+                    formatted += '</div>';
+
+                    this.showDate = widget.getValue('showDate');
+                    if (this.showDate == 'true') {
+                        formatted += '<div id="date">';
+                        formatted += '<span id="day" class="digits">%d</span>/';
+                        formatted += '<span id="month" class="digits">%m</span>/';
+                        formatted += '<span id="year" class="digits">%Y</span>';
+                        formatted += '</div>';
+                    }
+
+                    return '<div id="app-wrapper">' + this.time.strftime(formatted) + '</div>';
+                },
+
+                updateTime: function () {
+                    this.widget.setBody({
+                        tag: 'p',
+                        html: this.timeFormat()
+                    });
+                },
+
+                onLoad: function () {
+                    MyWidget.updateTime();
+                    this.updateInterval = window.setInterval(function() { MyWidget.updateTime(); }, 1000);
+                }
+            };
+
+            widget.addEvent('onLoad', MyWidget.onLoad);
+
+            //]]>
+        </script>
+    </head>
+    <body>
+        <p>Loading...</p>
+    </body>
+</html>
